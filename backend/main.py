@@ -10,19 +10,23 @@ load_dotenv()
 api_key = os.getenv("COINGECKO_API_KEY")
 
 
+def fetch_and_store_data():
+    raw_data = fetch_crypto_data(api_key)
+    cleaned_df = clean_crypto_data(raw_data)
+    save_to_db(cleaned_df)
+
+
 @asynccontextmanager
-async def lifespan(app: FastAPI):
-    fetch_and_store()
+async def startup_shutdown(app: FastAPI):
+    fetch_and_store_data()
     yield
     app.state.data = None
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=startup_shutdown)
 
 
 @app.get("/fetch-and-store")
 def fetch_and_store():
-    raw_data = fetch_crypto_data(api_key)
-    cleaned_df = clean_crypto_data(raw_data)
-    save_to_db(cleaned_df)
+    fetch_and_store_data()
     return {"status": "Data fetched, cleaned, and stored in database"}
