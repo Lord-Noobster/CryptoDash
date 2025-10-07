@@ -26,7 +26,7 @@ async def startup_shutdown(app: FastAPI):
 app = FastAPI(lifespan=startup_shutdown)
 
 
-@app.get("/fetch-and-store")
-def fetch_and_store():
+@app.get("/trigger-data-fetch")
+def trigger_data_fetch():
     fetch_and_store_data()
     return {"status": "Data fetched, cleaned, and stored in database"}
